@@ -2,7 +2,6 @@ package com.greggameplayer.kotlinmailsystem.controllers
 
 import com.greggameplayer.kotlinmailsystem.AppExecutors
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
-import java.util.*
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.mail.Message
