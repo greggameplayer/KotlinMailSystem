@@ -1,9 +1,11 @@
 package com.greggameplayer.kotlinmailsystem.controllers
 
+import android.net.Network
 import com.greggameplayer.kotlinmailsystem.AppExecutors
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
+import javax.mail.Address
 import javax.mail.Message
 import javax.mail.Transport
 import javax.mail.internet.InternetAddress
@@ -20,11 +22,12 @@ class EmailController {
             val props = System.getProperties()
             props["mail.smtp.host"] = "mx.gregoire.live"
             props["mail.smtp.socketFactory.port"] = "587"
-            props["mail.smtp.socketFactory.class"] = "javax.net.ssl.SSLSocketFactory"
+            props["mail.smtp.socketFactory.class"] = "com.greggameplayer.kotlinmailsystem.controllers.AlwaysTrustSSLContextFactory"
             props["mail.smtp.auth"] = "true"
             props["mail.smtp.port"] = "587"
             props["mail.smtp.ssl.trust"] = "*"
             props["mail.smtp.debug"] = "true"
+            props["mail.smtp.starttls.enable"] = "true"
 
             val session = javax.mail.Session.getDefaultInstance(props,
                 object : javax.mail.Authenticator() {
