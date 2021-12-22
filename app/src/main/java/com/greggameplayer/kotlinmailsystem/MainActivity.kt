@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.greggameplayer.kotlinmailsystem.controllers.EmailController
 import com.greggameplayer.kotlinmailsystem.controllers.Login
 import com.greggameplayer.kotlinmailsystem.controllers.SendMail
+import com.greggameplayer.kotlinmailsystem.controllers.SignUp
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
 
         val btPass : Button = findViewById(R.id.bt_pass)
         val buttonGoConnexion : Button = findViewById(R.id.buttonGoConnexion)
+        val buttonGoInscription : Button = findViewById(R.id.buttonGoInscription)
 
         btPass.setOnClickListener{
             val intent = Intent(this, SendMail::class.java)
@@ -29,7 +31,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
         }
-
+        buttonGoInscription.setOnClickListener{
+            val intent = Intent(this, SignUp::class.java)
+            startActivity(intent)
+        }
 
     }
 
