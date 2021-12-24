@@ -1,4 +1,6 @@
-package com.greggameplayer.kotlinmailsystem.controllers;
+package com.greggameplayer.kotlinmailsystem.beans;
+
+import android.annotation.SuppressLint;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.KeyManager;
@@ -19,17 +22,19 @@ import javax.net.ssl.X509TrustManager;
 
 public class AlwaysTrustSSLContextFactory extends SSLSocketFactory {
 
-    private SSLSocketFactory factory;
+    private final SSLSocketFactory factory;
 
+    @SuppressLint({"CustomX509TrustManager", "TrustAllX509TrustManager"})
+    @SuppressWarnings("java:S4830")
     public static class DefaultTrustManager implements X509TrustManager {
 
         @Override
         public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-                throws CertificateException {}
+                throws CertificateException { /* Always trust */ }
 
         @Override
         public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-                throws CertificateException {}
+                throws CertificateException { /* Always trust */ }
 
         @Override
         public X509Certificate[] getAcceptedIssuers() {
@@ -55,6 +60,7 @@ public class AlwaysTrustSSLContextFactory extends SSLSocketFactory {
         }
     }
 
+    @Override
     public Socket createSocket() throws IOException {
         return factory.createSocket();
     }
@@ -84,8 +90,17 @@ public class AlwaysTrustSSLContextFactory extends SSLSocketFactory {
         return factory.createSocket(host, port);
     }
 
-    public boolean equals(Object obj) {
-        return factory.equals(obj);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AlwaysTrustSSLContextFactory that = (AlwaysTrustSSLContextFactory) o;
+        return Objects.equals(factory, that.factory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(factory);
     }
 
     public String[] getDefaultCipherSuites() {
