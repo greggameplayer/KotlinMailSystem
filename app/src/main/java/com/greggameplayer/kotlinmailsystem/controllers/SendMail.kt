@@ -47,6 +47,11 @@ class SendMail : AppCompatActivity() {
                     Toast.makeText(applicationContext, "Messages : ${paginatedEmails.emails.size}", Toast.LENGTH_LONG).show()
                 }
             }*/
+            /* emailController.getEmailsCount(Mailboxes.SENT, true) {
+                AppExecutors.MainThreadExecutor().execute {
+                    Toast.makeText(applicationContext, "Messages : $it", Toast.LENGTH_LONG).show()
+                }
+            } */
             this.finish()
             Toast.makeText(this, "Le mail a bien été envoyé.", Toast.LENGTH_LONG).show()
         }

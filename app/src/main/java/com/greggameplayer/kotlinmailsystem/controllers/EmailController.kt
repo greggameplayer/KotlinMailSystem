@@ -7,8 +7,12 @@ import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 import com.sun.mail.imap.IMAPSSLStore
 import java.net.URLEncoder
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
+import javax.inject.Singleton
 import javax.mail.*
 import javax.mail.internet.InternetAddress
 import javax.mail.internet.MimeBodyPart
@@ -16,6 +20,7 @@ import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 import kotlin.math.ceil
 
+@Singleton
 class EmailController {
     lateinit var appExecutors: AppExecutors
 
@@ -87,11 +92,12 @@ class EmailController {
                         )
                     )
                     store.connect()
-                    val folder = store.getFolder("Sent")
+                    val folder = store.getFolder(Mailboxes.SENT.value)
                     folder.open(Folder.READ_WRITE)
                     folder.appendMessages(arrayOf(message))
                     message.setFlag(Flags.Flag.RECENT, true)
                     message.setFlag(Flags.Flag.SEEN, true)
+                    message.saveChanges()
                     folder.close()
                     store.close()
                 }
@@ -105,7 +111,7 @@ class EmailController {
         }
     }
 
-    fun retrieveAllEmails(mailboxes: Mailboxes, callback: (Array<Message>) -> Unit) {
+    fun retrieveAllEmails(mailbox: Mailboxes, callback: (Array<Message>) -> Unit) {
         var messages: Array<Message>
         val networkThread = appExecutors.networkIO()
         val mainThread = appExecutors.mainThread()
@@ -127,7 +133,7 @@ class EmailController {
                         )
                     )
                     store.connect()
-                    val folder = store.getFolder(mailboxes.value)
+                    val folder = store.getFolder(mailbox.value)
                     folder.open(Folder.READ_ONLY)
                     messages = folder.messages
                     folder.close()
@@ -143,7 +149,12 @@ class EmailController {
         }
     }
 
-    fun retrievePaginatedEmails(mailboxes: Mailboxes, page: Int, itemsPerPage: Int = 10, callback: (PaginatedEmails) -> Unit) {
+    fun retrievePaginatedEmails(
+        mailbox: Mailboxes,
+        page: Int,
+        itemsPerPage: Int = 10,
+        callback: (PaginatedEmails) -> Unit
+    ) {
         var messages: Array<Message>
         var firstMessageOnRequestedPage: Int
         var lastMessageOnRequestedPage: Int
@@ -166,16 +177,17 @@ class EmailController {
                         )
                     )
                     store.connect()
-                    val folder = store.getFolder(mailboxes.value)
+                    val folder = store.getFolder(mailbox.value)
                     folder.open(Folder.READ_ONLY)
-                    val totalPages = ceil(folder.messageCount/itemsPerPage.toDouble()).toInt()
-                    val paginatedEmails = PaginatedEmails(page = page + 1, totalPages = totalPages, itemsPerPage = itemsPerPage)
+                    val totalPages = ceil(folder.messageCount / itemsPerPage.toDouble()).toInt()
+                    val paginatedEmails =
+                        PaginatedEmails(page = page + 1, totalPages = totalPages, itemsPerPage = itemsPerPage)
                     firstMessageOnRequestedPage = page * itemsPerPage + 1
                     lastMessageOnRequestedPage = firstMessageOnRequestedPage + itemsPerPage - 1
-                    messages = if (firstMessageOnRequestedPage > folder.messageCount)  {
+                    messages = if (firstMessageOnRequestedPage > folder.messageCount) {
                         arrayOf()
                     } else {
-                        if(lastMessageOnRequestedPage > folder.messageCount) {
+                        if (lastMessageOnRequestedPage > folder.messageCount) {
                             folder.getMessages(firstMessageOnRequestedPage, folder.messageCount).reversedArray()
                         } else {
                             folder.getMessages(firstMessageOnRequestedPage, lastMessageOnRequestedPage).reversedArray()
@@ -191,6 +203,76 @@ class EmailController {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    fun getEmailsCount(mailbox: Mailboxes, notSeen: Boolean = false, callback: (Int) -> Unit) {
+        appExecutors.diskIO().execute {
+            try {
+                appExecutors.networkIO().execute {
+                    val store = IMAPSSLStore(
+                        session,
+                        URLName(
+                            "imaps://${
+                                URLEncoder.encode(
+                                    Credentials.EMAIL,
+                                    "UTF-8"
+                                )
+                            }:${Credentials.PASSWORD}@mx.gregoire.live:993"
+                        )
+                    )
+                    store.connect()
+                    val folder = store.getFolder(mailbox.value)
+                    folder.open(Folder.READ_ONLY)
+                    if(notSeen) {
+                        callback.invoke(folder.unreadMessageCount)
+                    } else {
+                        callback.invoke(folder.messageCount)
+                    }
+                    folder.close()
+                    store.close()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun setSeen(mailbox: Mailboxes, message: Message, status: Boolean, callback: ((Boolean) -> Unit)?) {
+        val mainThread = appExecutors.mainThread()
+
+        appExecutors.diskIO().execute {
+            try {
+                appExecutors.networkIO().execute {
+                    val store = IMAPSSLStore(
+                        session,
+                        URLName(
+                            "imaps://${
+                                URLEncoder.encode(
+                                    Credentials.EMAIL,
+                                    "UTF-8"
+                                )
+                            }:${Credentials.PASSWORD}@mx.gregoire.live:993"
+                        )
+                    )
+                    store.connect()
+                    val folder = store.getFolder(mailbox.value)
+                    folder.open(Folder.READ_WRITE)
+                    val modifiedMessage = folder.getMessage(message.messageNumber)
+                    modifiedMessage.setFlag(Flags.Flag.SEEN, status)
+                    modifiedMessage.saveChanges()
+                    folder.close()
+                    store.close()
+                    mainThread.execute {
+                        callback?.invoke(true)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                mainThread.execute {
+                    callback?.invoke(false)
+                }
             }
         }
     }
