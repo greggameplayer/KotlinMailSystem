@@ -1,16 +1,20 @@
 package com.greggameplayer.kotlinmailsystem.controllers
 
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.greggameplayer.kotlinmailsystem.AppExecutors
 import com.greggameplayer.kotlinmailsystem.R
+import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 
 class SendMail : AppCompatActivity() {
     var emailController: EmailController = EmailController()
+    val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,8 +36,24 @@ class SendMail : AppCompatActivity() {
 
         btSend.setOnClickListener{
             emailController.sendEmail(etTo.text.toString(), etSubject.text.toString(), etContent.text.toString())
+            /*emailController.retrievePaginatedEmails(Mailboxes.SENT, 0, 10) { paginatedEmails ->
+                AppExecutors.MainThreadExecutor().execute {
+                    println("Message : ${paginatedEmails.emails.size}")
+                    println("Page : ${paginatedEmails.page}")
+                    println("Total : ${paginatedEmails.totalPages}")
+                    println("Next : ${paginatedEmails.hasNextPage}")
+                    println("Previous : ${paginatedEmails.hasPreviousPage}")
+                    println("ItemsPerPage : ${paginatedEmails.itemsPerPage}")
+                    Toast.makeText(applicationContext, "Messages : ${paginatedEmails.emails.size}", Toast.LENGTH_LONG).show()
+                }
+            }*/
+            /* emailController.getEmailsCount(Mailboxes.SENT, true) {
+                AppExecutors.MainThreadExecutor().execute {
+                    Toast.makeText(applicationContext, "Messages : $it", Toast.LENGTH_LONG).show()
+                }
+            } */
             this.finish()
-            Toast.makeText(this, "Le mail à bien été envoyer.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Le mail a bien été envoyé.", Toast.LENGTH_LONG).show()
         }
 
 
