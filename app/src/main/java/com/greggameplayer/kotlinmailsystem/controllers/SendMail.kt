@@ -1,16 +1,13 @@
 package com.greggameplayer.kotlinmailsystem.controllers
 
-import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.greggameplayer.kotlinmailsystem.AppExecutors
 import com.greggameplayer.kotlinmailsystem.R
-import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 
 class SendMail : AppCompatActivity() {
     var emailController: EmailController = EmailController()

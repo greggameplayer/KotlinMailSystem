@@ -7,9 +7,6 @@ import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 import com.sun.mail.imap.IMAPSSLStore
 import java.net.URLEncoder
 import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.concurrent.TimeUnit
 import javax.activation.DataHandler
 import javax.activation.FileDataSource
 import javax.inject.Singleton
