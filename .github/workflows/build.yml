@@ -9,16 +9,16 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+    - name: Sonarcube scan
+      uses: jinguji/sonarcloud-gradle-github-action@v2
+      with:
+        sonar-token: ${{ secrets.SONAR_TOKEN }}
+        sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
+        sonar-organization: default-organization
+        sonar-project-key: KotlinMailSystem
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
