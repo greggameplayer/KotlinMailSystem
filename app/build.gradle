@@ -57,5 +57,6 @@ dependencies {
 sonarqube {
     properties {
         property "sonar.projectVersion", "${project.android.defaultConfig.versionName}"
+        property "sonar.projectName", "KotlinMailSystem"
     }
 }
