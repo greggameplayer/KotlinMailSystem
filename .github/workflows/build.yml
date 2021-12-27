@@ -19,6 +19,5 @@ jobs:
         sonar-token: ${{ secrets.SONAR_TOKEN }}
         sonar-host-url: ${{ secrets.SONAR_HOST_URL }}
         sonar-organization: default-organization
-        sonar-project-key: KotlinMailSystem
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
