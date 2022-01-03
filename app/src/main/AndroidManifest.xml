@@ -22,7 +22,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".controllers.SendMail"/>
-        <activity android:name=".controllers.Login"/>
         <activity android:name=".controllers.SignUp"/>
     </application>
 
