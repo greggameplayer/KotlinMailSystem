@@ -2,9 +2,11 @@ package com.greggameplayer.kotlinmailsystem
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import com.greggameplayer.kotlinmailsystem.beans.MailboxBean
@@ -12,11 +14,33 @@ import com.greggameplayer.kotlinmailsystem.controllers.EmailController
 import com.greggameplayer.kotlinmailsystem.controllers.RetrofitController
 import com.greggameplayer.kotlinmailsystem.controllers.SendMail
 import com.greggameplayer.kotlinmailsystem.controllers.SignUp
+import kotlinx.android.synthetic.main.test_activity_main.*
+import kotlinx.android.synthetic.main.test_content_main.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 
-class MainActivity : AppCompatActivity(), CoroutineScope {
+class MainActivity : AppCompatActivity(){//, CoroutineScope {
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.test_activity_main)
+        setSupportActionBar(toolbar)
+
+
+        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.open, R.string.close)
+        toggle.isDrawerIndicatorEnabled = true
+        drawer_layout.addDrawerListener(toggle)
+        toggle.syncState()
+    }
+
+
+
+
+
+
+    /*
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job
 
@@ -71,4 +95,6 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         job.cancel() // cancel the Job
         super.onDestroy()
     }
+
+     */
 }
