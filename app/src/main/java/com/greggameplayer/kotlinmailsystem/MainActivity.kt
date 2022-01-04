@@ -3,11 +3,14 @@ package com.greggameplayer.kotlinmailsystem
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import com.greggameplayer.kotlinmailsystem.beans.MailboxBean
-import com.greggameplayer.kotlinmailsystem.beans.RetrofitResponse
 import com.greggameplayer.kotlinmailsystem.controllers.EmailController
 import com.greggameplayer.kotlinmailsystem.controllers.RetrofitController
+import com.greggameplayer.kotlinmailsystem.controllers.SendMail
 import com.greggameplayer.kotlinmailsystem.controllers.SignUp
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
@@ -26,13 +29,35 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
         job = Job()
         emailController.appExecutors = AppExecutors()
         setContentView(R.layout.connexion)
-        val btLogin = findViewById<Button>(R.id.buttonConnexion)
-        val btSignup = findViewById<Button>(R.id.buttonInscription)
+
+        val etEmail: EditText = findViewById(R.id.etEmail)
+        val etPassword: EditText = findViewById(R.id.etPassword)
+
+        val btLogin = findViewById<Button>(R.id.btLogin)
+        val btSignup = findViewById<Button>(R.id.btSignup)
 
         btLogin.setOnClickListener {
             launch {
-                val result = retrofitController.service.verifyMailbox(MailboxBean("kotlin@gregoire.live", "kotlin"))
-                println(result.success ?: "")
+                if (etEmail.text.toString() != "" || etPassword.text.toString() != "") {
+                    val result = retrofitController.service.verifyMailbox(
+                        MailboxBean(
+                            etEmail.text.toString(),
+                            etPassword.text.toString()
+                        )
+                    )
+                    if (result.success == true) {
+                        Credentials.EMAIL = result.username ?: ""
+                        Credentials.PASSWORD = result.password ?: ""
+                        Credentials.NAME = result.name ?: ""
+                        val intent = Intent(this@MainActivity, SendMail::class.java)
+                        startActivity(intent)
+                    } else {
+                        Toast.makeText(this@MainActivity, "Identifiant incorrect.", Toast.LENGTH_LONG).show()
+                    }
+                }
+                else{
+                    Toast.makeText(this@MainActivity, "Veuillez remplir tous les champs avant de valider.", Toast.LENGTH_LONG).show()
+                }
             }
         }
 
