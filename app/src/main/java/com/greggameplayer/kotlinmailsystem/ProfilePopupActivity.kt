@@ -66,11 +66,11 @@ class ProfilePopupActivity : AppCompatActivity(), CoroutineScope {
         ).start()
 
         popup_window_button.setOnClickListener {
-            onBackPressed()
+            onBtPress()
         }
     }
 
-    override fun onBackPressed() {
+    private fun onBtPress() {
         launch {
             val returnIntent = Intent()
             val result = retrofitController.service.modifyMailbox(MailboxBean(Credentials.EMAIL, popup_window_text.text.toString(), newName))

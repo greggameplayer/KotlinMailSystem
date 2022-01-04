@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         Credentials.EMAIL = result.username ?: ""
                         Credentials.PASSWORD = result.password ?: ""
                         Credentials.NAME = result.name ?: ""
-                        val intent = Intent(this@MainActivity, SendMail::class.java)
+                        val intent = Intent(this@MainActivity, ProfileActivity::class.java)
                         startActivity(intent)
                     } else {
                         Toast.makeText(this@MainActivity, "Identifiant incorrect.", Toast.LENGTH_LONG).show()
