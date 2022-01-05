@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,7 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
     var emailController: EmailController = EmailController()
     lateinit var listEmails: Array<Message>
     lateinit var mailbox : Mailboxes
+    lateinit var btNewMail : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +36,7 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
         toggle.isDrawerIndicatorEnabled = true
         all_emails.addDrawerListener(toggle)
         toggle.syncState()
-        nav_drawer.setNavigationItemSelectedListener(this)
+        test_nav_menu.setNavigationItemSelectedListener(this)
 
         iniRefreshListener()
 
@@ -43,17 +45,26 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
         emailController.appExecutors = AppExecutors()
         loadEmailsAndRV()
 
+        btNewMail = findViewById(R.id.btn_new_email)
+
+        btNewMail.setOnClickListener{
+            this.finish()
+            val intent = Intent(this, SendMail::class.java)
+            startActivity(intent)
+        }
+
+
     }
 
-    private fun loadEmailsAndRV(){
-        //To load emails
-        emailController.retrieveAllEmails(mailbox){emails ->
-            AppExecutors.MainThreadExecutor().execute {
-                listEmails = emails
-                callAdapterRV(listEmails)
-            }
-        }
-    }
+   private fun loadEmailsAndRV(){
+       //To load emails
+       emailController.retrieveAllEmails(mailbox){emails ->
+           AppExecutors.MainThreadExecutor().execute {
+               listEmails = emails
+               callAdapterRV(listEmails)
+           }
+       }
+   }
 
     private fun callAdapterRV(listEmails: Array<Message>) {
         recycler_view.adapter = EmailsListAdapter(this, listEmails)
@@ -62,19 +73,16 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         if(item.itemId == R.id.all_messages ){
-            Toast.makeText(this@AllEmailsController, "test1", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, AllEmailsController::class.java)
             intent.putExtra("mailbox_type",Mailboxes.INBOX)
             startActivity(intent)
         }
         if(item.itemId == R.id.messages_sended ){
-            Toast.makeText(this, "test2", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, AllEmailsController::class.java)
             intent.putExtra("mailbox_type",Mailboxes.SENT)
             startActivity(intent)
         }
         if(item.itemId == R.id.drafts ){
-            Toast.makeText(this, "test3", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, AllEmailsController::class.java)
             intent.putExtra("mailbox_type",Mailboxes.DRAFTS)
             startActivity(intent)

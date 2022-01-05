@@ -1,6 +1,7 @@
 package com.greggameplayer.kotlinmailsystem.controllers
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.LayoutInflater
@@ -16,6 +17,8 @@ class EmailsListAdapter(
     activity: Activity,
     private val data: Array<Message>
 ): RecyclerView.Adapter<EmailsListAdapter.VH>() {
+
+    var ctx = activity
 
     inner class VH(itemView: View):RecyclerView.ViewHolder(itemView){
         var content: TextView
@@ -48,7 +51,8 @@ class EmailsListAdapter(
     }
 
     override fun onBindViewHolder(vh: VH, position: Int) {
-        vh.from.text = "victormarit@gmail.fr"
+        //vh.from.text = data.get(position).from.toString()
+        vh.from.text = "victormarit.95@gmail.com"
         vh.subject.text = "Avancement du projet"
         vh.content.text = "Avancement du projet c'est la merde"
         //TODO check is openIf is already read
@@ -58,7 +62,11 @@ class EmailsListAdapter(
         vh.subject.setTypeface(Typeface.DEFAULT_BOLD)
 
         vh.card.setOnClickListener{
-            vh.card.setCardBackgroundColor(Color.GRAY);
+            val intent = Intent(ctx, EmailDetails::class.java)
+            intent.putExtra("from", "victormarit@gmail112.fr")
+            intent.putExtra("content", "Avancement du projet")
+            intent.putExtra("subject", "Avancement du projet c'est la merde")
+            ctx.startActivity(intent)
         }
     }
 

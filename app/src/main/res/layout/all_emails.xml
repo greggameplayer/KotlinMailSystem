@@ -8,22 +8,13 @@
             android:layout_height="match_parent"
             android:id="@+id/all_emails">
 
-        <include
-                layout="@layout/drawer_content"/>
-
-        <com.google.android.material.navigation.NavigationView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:headerLayout="@layout/drawer_navigation_header"
-                app:menu="@menu/drawer_naviagtion_menu"
-                android:id="@+id/nav_drawer"
-                android:layout_gravity="start"
-        />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swipe_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
+
+
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -39,15 +30,28 @@
                                 android:layout_marginBottom="55dp">
                         </androidx.recyclerview.widget.RecyclerView>
                         <Button
+                                android:text="Nouveau"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/new_mail_btn"
+                                android:layout_height="wrap_content" android:id="@+id/btn_new_email"
                                 app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintTop_toBottomOf="@+id/recycler_view"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                android:autoText="false" android:text="fgdsfgdsf"/>
+                                app:layout_constraintStart_toStartOf="parent"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        <include
+                layout="@layout/drawer_content"/>
+
+        <com.google.android.material.navigation.NavigationView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:headerLayout="@layout/drawer_navigation_header"
+                app:menu="@menu/drawer_naviagtion_menu"
+                android:id="@+id/test_nav_menu"
+                android:layout_gravity="start"
+        />
+
 </androidx.drawerlayout.widget.DrawerLayout>
+
+
 
