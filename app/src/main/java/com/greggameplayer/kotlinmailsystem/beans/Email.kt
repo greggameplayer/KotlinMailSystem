@@ -1,5 +1,6 @@
 package com.greggameplayer.kotlinmailsystem.beans
 
+// Bean class representing an email
 class Email {
     var id: Int = 0
     var from: String = ""

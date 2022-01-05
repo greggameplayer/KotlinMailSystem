@@ -14,6 +14,7 @@
 
         <activity
                 android:name=".MainActivity"
+                android:theme="@style/Theme.KotlinMailSystem.NoActionBar"
                 android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -22,8 +23,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".controllers.SendMail"/>
-        <activity android:name=".controllers.Login"/>
         <activity android:name=".controllers.SignUp"/>
+        <activity android:name=".ProfileActivity"/>
+        <activity android:name=".ProfilePopupActivity"/>
+        <activity android:name=".controllers.AllEmailsController" android:theme="@style/Theme.KotlinMailSystem.NoActionBar"/>
+        <activity android:name=".controllers.EmailDetails" />
     </application>
 
 </manifest>

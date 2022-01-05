@@ -3,39 +3,80 @@ package com.greggameplayer.kotlinmailsystem
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.greggameplayer.kotlinmailsystem.controllers.EmailController
-import com.greggameplayer.kotlinmailsystem.controllers.Login
-import com.greggameplayer.kotlinmailsystem.controllers.SendMail
-import com.greggameplayer.kotlinmailsystem.controllers.SignUp
+import com.greggameplayer.kotlinmailsystem.beans.Credentials
+import com.greggameplayer.kotlinmailsystem.beans.MailboxBean
+import com.greggameplayer.kotlinmailsystem.controllers.*
+import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 
-class MainActivity : AppCompatActivity() {
-    var emailController : EmailController = EmailController()
+class MainActivity : AppCompatActivity(), CoroutineScope {
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.Main + job
+
+    private lateinit var job: Job
+    var emailController: EmailController = EmailController()
+    var retrofitController: RetrofitController = RetrofitController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        job = Job()
         emailController.appExecutors = AppExecutors()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.connexion)
 
-        val btPass : Button = findViewById(R.id.bt_pass)
-        val buttonGoConnexion : Button = findViewById(R.id.buttonGoConnexion)
-        val buttonGoInscription : Button = findViewById(R.id.buttonGoInscription)
+        val etEmail: EditText = findViewById(R.id.etEmail)
+        val etPassword: EditText = findViewById(R.id.etPassword)
 
-        btPass.setOnClickListener{
-            val intent = Intent(this, SendMail::class.java)
-            startActivity(intent)
+        val btLogin = findViewById<Button>(R.id.btLogin)
+        val btSignup = findViewById<Button>(R.id.btSignup)
+
+        btLogin.setOnClickListener {
+            launch {
+                //check that the email and password fields are filled in
+                if (etEmail.text.toString() != "" || etPassword.text.toString() != "") {
+                    //api call
+                    val result = retrofitController.service.verifyMailbox(
+                        MailboxBean(
+                            etEmail.text.toString(),
+                            etPassword.text.toString()
+                        )
+                    )
+                    // in case the entered identifiers are correct
+                    if (result.success == true) {
+                        //defined session data about the user
+                        Credentials.EMAIL = result.username ?: ""
+                        Credentials.PASSWORD = result.password ?: ""
+                        Credentials.NAME = result.name ?: ""
+                        //access to the allMails view of the logged-in user
+                        val intent = Intent(this@MainActivity, AllEmailsController::class.java)
+                        intent.putExtra("mailbox_type", Mailboxes.INBOX)
+                        startActivity(intent)
+                    // in case the entered identifiers are not correct
+                    } else {
+                        //return the problem to the user
+                        Toast.makeText(this@MainActivity, "Identifiant incorrect.", Toast.LENGTH_LONG).show()
+                    }
+                }
+                else{
+                    //return the problem to the user
+                    Toast.makeText(this@MainActivity, "Veuillez remplir tous les champs avant de valider.", Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
-        buttonGoConnexion.setOnClickListener{
-            val intent = Intent(this, Login::class.java)
-            startActivity(intent)
-        }
-        buttonGoInscription.setOnClickListener{
+        //access to the SignUp view to create an account
+        btSignup.setOnClickListener {
             val intent = Intent(this, SignUp::class.java)
             startActivity(intent)
         }
-
     }
 
+    override fun onDestroy() {
+        job.cancel() // cancel the Job
+        super.onDestroy()
+    }
 }

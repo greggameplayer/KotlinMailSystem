@@ -5,6 +5,7 @@ import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import com.greggameplayer.kotlinmailsystem.beans.PaginatedEmails
 import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 import com.sun.mail.imap.IMAPSSLStore
+import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
 import javax.activation.DataHandler
@@ -16,6 +17,7 @@ import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 import kotlin.math.ceil
+
 
 @Singleton
 class EmailController {
@@ -52,9 +54,14 @@ class EmailController {
             })
     }
 
+    // send email
+    // The email argument is the email to send to
+    // The subject argument is the subject of the email
+    // The content argument is the content of the email
+    // The attachments argument is the attachments of the email
     fun sendEmail(email: String, subject: String, content: String, attachment: String = "") {
         println("Sending email to $email with subject $subject and content $content ${if (attachment.isNotEmpty()) " and attachment $attachment" else ""}")
-        appExecutors.diskIO().execute {
+        appExecutors.diskIO().execute { // Execute a disk thread
             try {
                 val message = MimeMessage(session)
                 message.setFrom(InternetAddress(Credentials.EMAIL))
@@ -72,11 +79,11 @@ class EmailController {
                     message.setContent(multipart)
                 }
 
-                appExecutors.networkIO().execute {
+                appExecutors.networkIO().execute { // Execute a network thread
                     Transport.send(message)
                 }
 
-                appExecutors.networkIO().execute {
+                appExecutors.networkIO().execute { // Execute a network thread
                     val store = IMAPSSLStore(
                         session,
                         URLName(
@@ -87,19 +94,19 @@ class EmailController {
                                 )
                             }:${Credentials.PASSWORD}@mx.gregoire.live:993"
                         )
-                    )
-                    store.connect()
-                    val folder = store.getFolder(Mailboxes.SENT.value)
-                    folder.open(Folder.READ_WRITE)
+                    )  // Define the IMAPs store
+                    store.connect() // Connect to the IMAPs store
+                    val folder = store.getFolder(Mailboxes.SENT.value) // Get the sent folder
+                    folder.open(Folder.READ_WRITE) // Open the sent folder in read/write mode
                     folder.appendMessages(arrayOf(message))
                     message.setFlag(Flags.Flag.RECENT, true)
                     message.setFlag(Flags.Flag.SEEN, true)
                     message.saveChanges()
-                    folder.close()
-                    store.close()
+                    folder.close() // Close the folder
+                    store.close() // Close the store
                 }
 
-                appExecutors.mainThread().execute {
+                appExecutors.mainThread().execute { // Execute a main thread
                     println("Email sent successfully and saved to Sent folder")
                 }
             } catch (e: Exception) {
@@ -108,16 +115,18 @@ class EmailController {
         }
     }
 
+    // Retrieve all emails from a mailbox and pass them to the callback function
+    // The mailbox argument can be one of the following: INBOX, SENT, DRAFTS, TRASH
     fun retrieveAllEmails(mailbox: Mailboxes, callback: (Array<Message>) -> Unit) {
         var messages: Array<Message>
         val networkThread = appExecutors.networkIO()
         val mainThread = appExecutors.mainThread()
         val diskThread = appExecutors.diskIO()
 
-        diskThread.execute {
+        diskThread.execute { // Execute a disk thread
             try {
 
-                networkThread.execute {
+                networkThread.execute { // Execute a network thread
                     val store = IMAPSSLStore(
                         session,
                         URLName(
@@ -133,12 +142,12 @@ class EmailController {
                     val folder = store.getFolder(mailbox.value)
                     folder.open(Folder.READ_ONLY)
                     messages = folder.messages
-                    folder.close()
-                    store.close()
                     mainThread.execute {
                         println("Retrieved ${messages.size} emails")
                     }
                     callback.invoke(messages)
+                    folder.close()
+                    store.close()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -146,6 +155,11 @@ class EmailController {
         }
     }
 
+    // Retrieve a paginated list of emails from a mailbox and pass them to the callback function in a PaginatedEmails bean
+    // The mailbox argument can be one of the following: INBOX, SENT, DRAFTS, TRASH
+    // The page argument is the page number to retrieve
+    // The itemsPerPage argument is the number of emails to retrieve per page
+    // The callback function will be called with a PaginatedEmails bean containing the list of emails and the total number of pages, etc.
     fun retrievePaginatedEmails(
         mailbox: Mailboxes,
         page: Int,
@@ -159,9 +173,9 @@ class EmailController {
         val mainThread = appExecutors.mainThread()
         val diskThread = appExecutors.diskIO()
 
-        diskThread.execute {
+        diskThread.execute { // Execute a disk thread
             try {
-                networkThread.execute {
+                networkThread.execute { // Execute a network thread
                     val store = IMAPSSLStore(
                         session,
                         URLName(
@@ -191,12 +205,12 @@ class EmailController {
                         }
                     }
                     paginatedEmails.emails = messages
-                    folder.close()
-                    store.close()
                     mainThread.execute {
                         println("Retrieved ${messages.size} emails")
                     }
                     callback.invoke(paginatedEmails)
+                    folder.close()
+                    store.close()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -204,10 +218,14 @@ class EmailController {
         }
     }
 
+    // Get the number of emails in a mailbox with or without a notSeen filter and pass it to the callback function
+    // The mailbox argument can be one of the following: INBOX, SENT, DRAFTS, TRASH
+    // The notSeen argument is a boolean to filter the number of emails with or without a notSeen flag
+    // The callback function will be called with the number of emails
     fun getEmailsCount(mailbox: Mailboxes, notSeen: Boolean = false, callback: (Int) -> Unit) {
-        appExecutors.diskIO().execute {
+        appExecutors.diskIO().execute { // Execute a disk thread
             try {
-                appExecutors.networkIO().execute {
+                appExecutors.networkIO().execute { // Execute a network thread
                     val store = IMAPSSLStore(
                         session,
                         URLName(
@@ -236,12 +254,17 @@ class EmailController {
         }
     }
 
+    // Set seen status of an email and pass result status to the callback function
+    // The mailbox argument can be one of the following: INBOX, SENT, DRAFTS, TRASH
+    // The message argument is the email to set the seen status
+    // The status argument is a boolean to set the seen status to true or false
+    // The callback function will be called with the result status
     fun setSeen(mailbox: Mailboxes, message: Message, status: Boolean, callback: ((Boolean) -> Unit)?) {
         val mainThread = appExecutors.mainThread()
 
-        appExecutors.diskIO().execute {
+        appExecutors.diskIO().execute { // Execute a disk thread
             try {
-                appExecutors.networkIO().execute {
+                appExecutors.networkIO().execute { // Execute a network thread
                     val store = IMAPSSLStore(
                         session,
                         URLName(
@@ -272,5 +295,51 @@ class EmailController {
                 }
             }
         }
+    }
+
+
+    // Get text content of an email
+    // The message argument is the email to get the text content
+    @Throws(MessagingException::class, IOException::class)
+    fun getTextFromMessage(message: Message): String {
+        var result = ""
+        if (message.isMimeType("text/plain")) {
+            result = message.content.toString()
+        } else if (message.isMimeType("text/html")) { // **
+            result = message.content.toString() // **
+        } else if (message.isMimeType("multipart/*")) {
+            val mimeMultipart = message.content as MimeMultipart
+            result = getTextFromMimeMultipart(mimeMultipart)
+        }
+        return result
+    }
+
+    // Get text content of a multipart email
+    // The mimeMultipart argument is the multipart email to get the text content
+    @Throws(MessagingException::class, IOException::class)
+    fun getTextFromMimeMultipart(
+        mimeMultipart: MimeMultipart
+    ): String {
+        var result = ""
+        val count = mimeMultipart.count
+        for (i in 0 until count) {
+            val bodyPart = mimeMultipart.getBodyPart(i)
+            if (bodyPart.isMimeType("text/plain")) {
+                result = """
+                $result
+                ${bodyPart.content}
+                """.trimIndent()
+                break // without break same text appears twice in my tests
+            } else if (bodyPart.isMimeType("text/html")) {
+                val html = bodyPart.content as String
+                result = """
+                $result
+                ${org.jsoup.Jsoup.parse(html).text()}
+                """.trimIndent()
+            } else if (bodyPart.content is MimeMultipart) {
+                result += getTextFromMimeMultipart(bodyPart.content as MimeMultipart)
+            }
+        }
+        return result
     }
 }

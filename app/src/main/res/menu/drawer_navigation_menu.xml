@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Tous les messages" android:id="@+id/all_messages"/>
+    <item android:title="Messages envoyés" android:id="@+id/messages_sended"/>
+    <item android:title="Brouillons" android:id="@+id/drafts"/>
+    <item android:title="Supprimés" android:id="@+id/deleted"/>
+    <item android:title="Déconnexion" android:id="@+id/log_out"/>
+</menu>

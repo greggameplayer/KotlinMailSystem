@@ -1,8 +1,10 @@
 package com.greggameplayer.kotlinmailsystem.beans
 
+// Bean class for storing user credentials
 class Credentials {
     companion object {
-        var EMAIL = "kotlin@gregoire.live"
-        var PASSWORD = "5Rw835P;75"
+        var EMAIL = ""
+        var PASSWORD = ""
+        var NAME = ""
     }
 }
