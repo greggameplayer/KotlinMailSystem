@@ -26,6 +26,7 @@
         <activity android:name=".controllers.SignUp"/>
         <activity android:name=".ProfileActivity"/>
         <activity android:name=".ProfilePopupActivity"/>
+        <activity android:name=".controllers.AllEmailsController" android:theme="@style/Theme.KotlinMailSystem.NoActionBar"/>
     </application>
 
 </manifest>

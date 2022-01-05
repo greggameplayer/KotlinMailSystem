@@ -2,26 +2,20 @@ package com.greggameplayer.kotlinmailsystem
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.widget.Button
-import android.widget.EditText
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.google.android.material.navigation.NavigationView
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
-import com.greggameplayer.kotlinmailsystem.beans.MailboxBean
-import com.greggameplayer.kotlinmailsystem.controllers.EmailController
-import com.greggameplayer.kotlinmailsystem.controllers.RetrofitController
-import com.greggameplayer.kotlinmailsystem.controllers.SendMail
-import com.greggameplayer.kotlinmailsystem.controllers.SignUp
+import com.greggameplayer.kotlinmailsystem.controllers.*
+import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
+import kotlinx.android.synthetic.main.drawer_content.*
 import kotlinx.android.synthetic.main.test_activity_main.*
-import kotlinx.android.synthetic.main.test_content_main.*
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
 
-class MainActivity : AppCompatActivity(){//, CoroutineScope {
-
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{//, CoroutineScope {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,12 +23,43 @@ class MainActivity : AppCompatActivity(){//, CoroutineScope {
         setSupportActionBar(toolbar)
 
 
-        val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.open, R.string.close)
+        val toggle = ActionBarDrawerToggle(this, test, toolbar, R.string.open, R.string.close)
         toggle.isDrawerIndicatorEnabled = true
-        drawer_layout.addDrawerListener(toggle)
+        test.addDrawerListener(toggle)
         toggle.syncState()
+
+        test_nav_menu.setNavigationItemSelectedListener(this)
     }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
+        if(item.itemId == R.id.all_messages ){
+            Toast.makeText(this, "Opended", Toast.LENGTH_SHORT).show()
+        }
+        if(item.itemId == R.id.messages_sended ){
+            val intent = Intent(this, AllEmailsController::class.java)
+            intent.putExtra("mailbox_type", Mailboxes.SENT)
+            startActivity(intent)
+        }
+        if(item.itemId == R.id.drafts ){
+            val intent = Intent(this, AllEmailsController::class.java)
+            intent.putExtra("mailbox_type", Mailboxes.DRAFTS)
+            startActivity(intent)
+        }
+        if(item.itemId == R.id.log_out ){
+            Credentials.EMAIL= ""
+            Credentials.NAME = ""
+            Credentials.PASSWORD = ""
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+        if(item.itemId == R.id.deleted ){
+            val intent = Intent(this, AllEmailsController::class.java)
+            intent.putExtra("mailbox_type", Mailboxes.TRASH)
+            startActivity(intent)
+        }
+        return true
+    }
 
 
 

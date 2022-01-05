@@ -5,17 +5,17 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/drawer_layout"
-        tools:context=".MainActivity">
+        android:id="@+id/test">
 
     <include
-        layout="@layout/test_content_main"/>
+        layout="@layout/drawer_content"/>
     
     <com.google.android.material.navigation.NavigationView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:headerLayout="@layout/test_navigation_header"
-            app:menu="@menu/test_naviagtion_menu"
+            app:headerLayout="@layout/drawer_navigation_header"
+            app:menu="@menu/drawer_naviagtion_menu"
+            android:id="@+id/test_nav_menu"
             android:layout_gravity="start"
         />
 

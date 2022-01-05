@@ -5,6 +5,7 @@ import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import com.greggameplayer.kotlinmailsystem.beans.PaginatedEmails
 import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 import com.sun.mail.imap.IMAPSSLStore
+import java.io.IOException
 import java.net.URLEncoder
 import java.util.*
 import javax.activation.DataHandler
@@ -16,6 +17,7 @@ import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 import kotlin.math.ceil
+
 
 @Singleton
 class EmailController {
@@ -133,12 +135,12 @@ class EmailController {
                     val folder = store.getFolder(mailbox.value)
                     folder.open(Folder.READ_ONLY)
                     messages = folder.messages
-                    folder.close()
-                    store.close()
                     mainThread.execute {
                         println("Retrieved ${messages.size} emails")
                     }
                     callback.invoke(messages)
+                    //folder.close()
+                    //store.close()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -272,5 +274,47 @@ class EmailController {
                 }
             }
         }
+    }
+
+
+    @Throws(MessagingException::class, IOException::class)
+    public fun getTextFromMessage(message: Message): String? {
+        var result = ""
+        if (message.isMimeType("text/plain")) {
+            result = message.content.toString()
+        } else if (message.isMimeType("text/html")) { // **
+            result = message.content.toString() // **
+        } else if (message.isMimeType("multipart/*")) {
+            val mimeMultipart = message.content as MimeMultipart
+            result = getTextFromMimeMultipart(mimeMultipart)
+        }
+        return result
+    }
+
+    @Throws(MessagingException::class, IOException::class)
+    public fun getTextFromMimeMultipart(
+        mimeMultipart: MimeMultipart
+    ): String {
+        var result = ""
+        val count = mimeMultipart.count
+        for (i in 0 until count) {
+            val bodyPart = mimeMultipart.getBodyPart(i)
+            if (bodyPart.isMimeType("text/plain")) {
+                result = """
+                $result
+                ${bodyPart.content}
+                """.trimIndent()
+                break // without break same text appears twice in my tests
+            } else if (bodyPart.isMimeType("text/html")) {
+                val html = bodyPart.content as String
+                result = """
+                $result
+                ${org.jsoup.Jsoup.parse(html).text()}
+                """.trimIndent()
+            } else if (bodyPart.content is MimeMultipart) {
+                result = result + getTextFromMimeMultipart(bodyPart.content as MimeMultipart)
+            }
+        }
+        return result
     }
 }
