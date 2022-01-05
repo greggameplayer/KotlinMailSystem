@@ -71,7 +71,7 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
                email.read = msg.flags.contains(Flags.Flag.SEEN)
                listEmails.add(email)
            }
-
+           listEmails.reverse()
            AppExecutors.MainThreadExecutor().execute {
                callAdapterRV(listEmails)
            }
