@@ -22,7 +22,7 @@ class EmailDetails:  AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.email_details)
 
-        //Content email
+        //to load intent extra
         val content = intent.extras?.get("content")
         val subject = intent.extras?.get("subject")
         val from = intent.extras?.get("from")

@@ -40,7 +40,6 @@ class EmailsListAdapter(
     override fun getItemCount(): Int {
         return data.size
     }
-
     private val inflater : LayoutInflater
 
     init {
@@ -53,6 +52,7 @@ class EmailsListAdapter(
     }
 
     override fun onBindViewHolder(vh: VH, position: Int) {
+        //To set data in the item view
         vh.content.text = data.get(position).body
         vh.subject.text = data.get(position).subject
         vh.from.text = data.get(position).from
@@ -62,13 +62,14 @@ class EmailsListAdapter(
         vh.subject.setTypeface(Typeface.DEFAULT_BOLD)
         //TODO check is openIf is already read
         if(data.get(position).read){
+            //To update front if email have already have been read
             vh.card.setCardBackgroundColor(Color.WHITE);
             vh.from.setTypeface(Typeface.DEFAULT)
             vh.subject.setTypeface(Typeface.DEFAULT)
         }
 
-
         vh.card.setOnClickListener{
+            //To redirect to EmailDetails (activity)
             val intent = Intent(ctx, EmailDetails::class.java)
             intent.putExtra("from", data.get(position).from)
             intent.putExtra("content", data.get(position).body)

@@ -31,7 +31,8 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.all_emails)
-        //drawer
+
+        //Drawer menu
         setSupportActionBar(toolbar)
         val toggle = ActionBarDrawerToggle(this, all_emails, toolbar, R.string.open, R.string.close)
         toggle.isDrawerIndicatorEnabled = true
@@ -39,6 +40,7 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
         toggle.syncState()
         test_nav_menu.setNavigationItemSelectedListener(this)
 
+        //swiper listener
         iniRefreshListener()
 
         //to know which emails have to be loaded
@@ -46,8 +48,8 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
         emailController.appExecutors = AppExecutors()
         loadEmailsAndRV()
 
+        //Btn to redirect to sendmailActiviy
         btNewMail = findViewById(R.id.btn_new_email)
-
         btNewMail.setOnClickListener{
             this.finish()
             val intent = Intent(this, SendMail::class.java)
@@ -77,11 +79,13 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
    }
 
     private fun callAdapterRV(listEmails: ArrayList<Email>) {
+        //To pass items to the recycler view
         recycler_view.adapter = EmailsListAdapter(this, listEmails)
         recycler_view.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        //To load an other activity in function of menu
         if(item.itemId == R.id.all_messages ){
             val intent = Intent(this, AllEmailsController::class.java)
             intent.putExtra("mailbox_type",Mailboxes.INBOX)
@@ -98,6 +102,7 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
             startActivity(intent)
         }
         if(item.itemId == R.id.log_out ){
+            //To disconnect user
             Credentials.EMAIL= ""
             Credentials.NAME = ""
             Credentials.PASSWORD = ""
@@ -109,11 +114,11 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
             intent.putExtra("mailbox_type",Mailboxes.TRASH)
             startActivity(intent)
         }
-
         return true
     }
 
     fun iniRefreshListener() {
+        //This function use swipper component, on up scroll it will reload recycler view (with a new api call)
             val swipeRefreshLayout=findViewById<SwipeRefreshLayout>(R.id.swipe_layout)
             swipeRefreshLayout.setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener {
                 loadEmailsAndRV()
