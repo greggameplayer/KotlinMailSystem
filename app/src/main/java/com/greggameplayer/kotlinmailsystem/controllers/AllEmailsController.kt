@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,9 +14,11 @@ import com.greggameplayer.kotlinmailsystem.AppExecutors
 import com.greggameplayer.kotlinmailsystem.MainActivity
 import com.greggameplayer.kotlinmailsystem.R
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
+import com.greggameplayer.kotlinmailsystem.beans.Email
 import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 import kotlinx.android.synthetic.main.all_emails.*
 import kotlinx.android.synthetic.main.drawer_content.*
+import javax.mail.Flags
 import javax.mail.Message
 
 class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
@@ -59,14 +60,23 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
    private fun loadEmailsAndRV(){
        //To load emails
        emailController.retrieveAllEmails(mailbox){emails ->
+           var listEmails = arrayListOf<Email>()
+           emails.forEach { msg ->
+               var email = Email()
+               email.body = emailController.getTextFromMessage(msg).toString()
+               email.from = msg.from.get(0).toString()
+               email.subject = msg.subject
+               email.read = msg.flags.contains(Flags.Flag.SEEN)
+               listEmails.add(email)
+           }
+
            AppExecutors.MainThreadExecutor().execute {
-               listEmails = emails
                callAdapterRV(listEmails)
            }
        }
    }
 
-    private fun callAdapterRV(listEmails: Array<Message>) {
+    private fun callAdapterRV(listEmails: ArrayList<Email>) {
         recycler_view.adapter = EmailsListAdapter(this, listEmails)
         recycler_view.layoutManager = LinearLayoutManager(this)
     }

@@ -11,14 +11,16 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.greggameplayer.kotlinmailsystem.R
-import javax.mail.Message
+import com.greggameplayer.kotlinmailsystem.beans.Email
+import javax.mail.Flags
 
 class EmailsListAdapter(
     activity: Activity,
-    private val data: Array<Message>
+    private val data: ArrayList<Email>
 ): RecyclerView.Adapter<EmailsListAdapter.VH>() {
 
     var ctx = activity
+    var emailsController : EmailController = EmailController()
 
     inner class VH(itemView: View):RecyclerView.ViewHolder(itemView){
         var content: TextView
@@ -51,21 +53,26 @@ class EmailsListAdapter(
     }
 
     override fun onBindViewHolder(vh: VH, position: Int) {
-        //vh.from.text = data.get(position).from.toString()
-        vh.from.text = "victormarit.95@gmail.com"
-        vh.subject.text = "Avancement du projet"
-        vh.content.text = "Avancement du projet c'est la merde"
-        //TODO check is openIf is already read
-        //if(data.get(position) == true){}
+        vh.content.text = data.get(position).body
+        vh.subject.text = data.get(position).subject
+        vh.from.text = data.get(position).from
+
         vh.card.setCardBackgroundColor(Color.WHITE);
         vh.from.setTypeface(Typeface.DEFAULT_BOLD)
         vh.subject.setTypeface(Typeface.DEFAULT_BOLD)
+        //TODO check is openIf is already read
+        if(data.get(position).read){
+            vh.card.setCardBackgroundColor(Color.WHITE);
+            vh.from.setTypeface(Typeface.DEFAULT)
+            vh.subject.setTypeface(Typeface.DEFAULT)
+        }
+
 
         vh.card.setOnClickListener{
             val intent = Intent(ctx, EmailDetails::class.java)
-            intent.putExtra("from", "victormarit@gmail112.fr")
-            intent.putExtra("content", "Avancement du projet")
-            intent.putExtra("subject", "Avancement du projet c'est la merde")
+            intent.putExtra("from", data.get(position).from)
+            intent.putExtra("content", data.get(position).body)
+            intent.putExtra("subject", data.get(position).subject)
             ctx.startActivity(intent)
         }
     }

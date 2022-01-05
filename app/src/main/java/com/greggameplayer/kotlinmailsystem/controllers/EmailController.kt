@@ -139,8 +139,8 @@ class EmailController {
                         println("Retrieved ${messages.size} emails")
                     }
                     callback.invoke(messages)
-                    //folder.close()
-                    //store.close()
+                    folder.close()
+                    store.close()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
