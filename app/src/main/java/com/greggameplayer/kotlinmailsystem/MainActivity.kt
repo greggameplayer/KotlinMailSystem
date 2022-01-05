@@ -8,10 +8,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import com.greggameplayer.kotlinmailsystem.beans.MailboxBean
-import com.greggameplayer.kotlinmailsystem.controllers.EmailController
-import com.greggameplayer.kotlinmailsystem.controllers.RetrofitController
-import com.greggameplayer.kotlinmailsystem.controllers.SendMail
-import com.greggameplayer.kotlinmailsystem.controllers.SignUp
+import com.greggameplayer.kotlinmailsystem.controllers.*
+import com.greggameplayer.kotlinmailsystem.enums.Mailboxes
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -49,7 +47,8 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
                         Credentials.EMAIL = result.username ?: ""
                         Credentials.PASSWORD = result.password ?: ""
                         Credentials.NAME = result.name ?: ""
-                        val intent = Intent(this@MainActivity, ProfileActivity::class.java)
+                        val intent = Intent(this@MainActivity, AllEmailsController::class.java)
+                        intent.putExtra("mailbox_type", Mailboxes.INBOX)
                         startActivity(intent)
                     } else {
                         Toast.makeText(this@MainActivity, "Identifiant incorrect.", Toast.LENGTH_LONG).show()

@@ -1,6 +1,7 @@
 package com.greggameplayer.kotlinmailsystem.controllers
 
 import android.os.Bundle
+import android.text.Editable
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -17,6 +18,9 @@ class SendMail : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         emailController.appExecutors = AppExecutors()
         setContentView(R.layout.send_mail)
+        val to = intent.extras?.get("to")
+
+
 
         //Button
         val btClose : ImageButton = findViewById(R.id.bt_close)
@@ -26,6 +30,11 @@ class SendMail : AppCompatActivity() {
         val etTo : EditText = findViewById(R.id.et_to)
         val etSubject : EditText = findViewById(R.id.et_subject)
         val etContent : EditText = findViewById(R.id.et_content)
+
+
+        to?.let {
+            etTo.text = Editable.Factory.getInstance().newEditable(to.toString())
+        }
 
         btClose.setOnClickListener{
             this.finish()
