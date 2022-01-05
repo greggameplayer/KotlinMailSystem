@@ -7,8 +7,10 @@
     <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#3F51B5"
-            android:theme="?attr/actionBarTheme"
+            android:background="#5564BB"
+            app:titleTextColor="@color/white"
+            app:title="MAILPOP"
+            android:theme="@style/Theme.KotlinMailSystem.NoActionBar"
             android:minHeight="?attr/actionBarSize"
             android:id="@+id/toolbar"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
