@@ -39,7 +39,7 @@ class EmailDetails:  AppCompatActivity() {
         //Button
         val btReply : Button = findViewById(R.id.bt_reply)
         btReply.setOnClickListener {
-            val intent = Intent(this, AllEmailsController::class.java)
+            val intent = Intent(this, SendMail::class.java)
             intent.putExtra("to",from.toString())
             startActivity(intent)
         }
