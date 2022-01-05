@@ -36,30 +36,39 @@ class MainActivity : AppCompatActivity(), CoroutineScope {
 
         btLogin.setOnClickListener {
             launch {
+                //check that the email and password fields are filled in
                 if (etEmail.text.toString() != "" || etPassword.text.toString() != "") {
+                    //api call
                     val result = retrofitController.service.verifyMailbox(
                         MailboxBean(
                             etEmail.text.toString(),
                             etPassword.text.toString()
                         )
                     )
+                    // in case the entered identifiers are correct
                     if (result.success == true) {
+                        //defined session data about the user
                         Credentials.EMAIL = result.username ?: ""
                         Credentials.PASSWORD = result.password ?: ""
                         Credentials.NAME = result.name ?: ""
+                        //access to the allMails view of the logged-in user
                         val intent = Intent(this@MainActivity, AllEmailsController::class.java)
                         intent.putExtra("mailbox_type", Mailboxes.INBOX)
                         startActivity(intent)
+                    // in case the entered identifiers are not correct
                     } else {
+                        //return the problem to the user
                         Toast.makeText(this@MainActivity, "Identifiant incorrect.", Toast.LENGTH_LONG).show()
                     }
                 }
                 else{
+                    //return the problem to the user
                     Toast.makeText(this@MainActivity, "Veuillez remplir tous les champs avant de valider.", Toast.LENGTH_LONG).show()
                 }
             }
         }
 
+        //access to the SignUp view to create an account
         btSignup.setOnClickListener {
             val intent = Intent(this, SignUp::class.java)
             startActivity(intent)
