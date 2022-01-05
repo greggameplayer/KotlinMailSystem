@@ -1,5 +1,6 @@
 package com.greggameplayer.kotlinmailsystem.beans
 
+// Bean class for Mailbox used as argument in API calls
 class MailboxBean {
     var username : String
     var password : String

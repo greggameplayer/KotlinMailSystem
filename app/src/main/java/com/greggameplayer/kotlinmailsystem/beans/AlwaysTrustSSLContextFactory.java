@@ -20,6 +20,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+// Bean class used to create a custom SSLSocketFactory that ignores SSL certificate errors
 public class AlwaysTrustSSLContextFactory extends SSLSocketFactory {
 
     private final SSLSocketFactory factory;

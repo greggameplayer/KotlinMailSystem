@@ -19,7 +19,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.ColorUtils
 import com.greggameplayer.kotlinmailsystem.beans.Credentials
 import com.greggameplayer.kotlinmailsystem.beans.MailboxBean
-import com.greggameplayer.kotlinmailsystem.controllers.EmailController
 import com.greggameplayer.kotlinmailsystem.controllers.RetrofitController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
+// Class used to create the profile popup
 class ProfilePopupActivity : AppCompatActivity(), CoroutineScope {
     override val coroutineContext: CoroutineContext
         get() = Dispatchers.Main + job

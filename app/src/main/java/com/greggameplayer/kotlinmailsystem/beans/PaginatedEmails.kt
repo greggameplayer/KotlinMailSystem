@@ -2,6 +2,7 @@ package com.greggameplayer.kotlinmailsystem.beans
 
 import javax.mail.Message
 
+// Bean class for paginated emails
 class PaginatedEmails(
     var emails: Array<Message> = arrayOf(),
     page: Int,
