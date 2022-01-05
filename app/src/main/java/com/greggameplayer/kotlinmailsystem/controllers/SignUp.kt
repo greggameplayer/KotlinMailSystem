@@ -32,6 +32,7 @@ class SignUp : AppCompatActivity(), CoroutineScope {
         emailController.appExecutors = AppExecutors()
         setContentView(R.layout.inscription)
 
+        //initialisation
         val editTextName: EditText = findViewById(R.id.editTextName)
         val editTextEmail: EditText = findViewById(R.id.editTextEmail)
         val editTextPassword: EditText = findViewById(R.id.editTextPassword)
@@ -39,8 +40,9 @@ class SignUp : AppCompatActivity(), CoroutineScope {
         val buttonSignUp = findViewById<Button>(R.id.buttonSignUp)
         val intent = Intent(this, MainActivity::class.java)
 
-        buttonSignUp.setOnClickListener {
+        buttonSignUp.setOnClickListener { //sign up function
             launch {
+                //Condition
                 if (editTextEmail.text.toString() != "" || editTextPassword.text.toString() != ""
                     || editTextName.text.toString() != "" || editTextPasswordConfirm.text.toString() != "" || editTextPassword.text.toString() == editTextPasswordConfirm.text.toString()) {
                     val result = retrofitController.service.createMailbox(
@@ -50,6 +52,7 @@ class SignUp : AppCompatActivity(), CoroutineScope {
                             editTextName.text.toString(),
                         )
                     )
+                    //if success
                     if (result.success == true) {
                         startActivity(intent)
                     } else {
