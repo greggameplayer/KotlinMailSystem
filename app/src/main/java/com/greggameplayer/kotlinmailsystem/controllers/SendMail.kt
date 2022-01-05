@@ -12,15 +12,14 @@ import com.greggameplayer.kotlinmailsystem.R
 
 class SendMail : AppCompatActivity() {
     var emailController: EmailController = EmailController()
-    val context = this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         emailController.appExecutors = AppExecutors()
         setContentView(R.layout.send_mail)
+
+        //rrecovery of the "to" variable in the case of a reply to an e-mail
         val to = intent.extras?.get("to")
-
-
 
         //Button
         val btClose : ImageButton = findViewById(R.id.bt_close)
@@ -31,34 +30,21 @@ class SendMail : AppCompatActivity() {
         val etSubject : EditText = findViewById(R.id.et_subject)
         val etContent : EditText = findViewById(R.id.et_content)
 
-
+        //set the variable previously retrieved in the editText "etTo" in the case of a reply to an email
         to?.let {
             etTo.text = Editable.Factory.getInstance().newEditable(to.toString())
         }
 
+        //backwards
         btClose.setOnClickListener{
             this.finish()
         }
 
         btSend.setOnClickListener{
+            //call the send mail service
             emailController.sendEmail(etTo.text.toString(), etSubject.text.toString(), etContent.text.toString())
-            /*emailController.retrievePaginatedEmails(Mailboxes.SENT, 0, 10) { paginatedEmails ->
-                AppExecutors.MainThreadExecutor().execute {
-                    println("Message : ${paginatedEmails.emails.size}")
-                    println("Page : ${paginatedEmails.page}")
-                    println("Total : ${paginatedEmails.totalPages}")
-                    println("Next : ${paginatedEmails.hasNextPage}")
-                    println("Previous : ${paginatedEmails.hasPreviousPage}")
-                    println("ItemsPerPage : ${paginatedEmails.itemsPerPage}")
-                    Toast.makeText(applicationContext, "Messages : ${paginatedEmails.emails.size}", Toast.LENGTH_LONG).show()
-                }
-            }*/
-            /* emailController.getEmailsCount(Mailboxes.SENT, true) {
-                AppExecutors.MainThreadExecutor().execute {
-                    Toast.makeText(applicationContext, "Messages : $it", Toast.LENGTH_LONG).show()
-                }
-            } */
             this.finish()
+            //user feedback
             Toast.makeText(this, "Le mail a bien été envoyé.", Toast.LENGTH_LONG).show()
         }
 
