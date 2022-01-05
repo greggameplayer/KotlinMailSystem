@@ -22,6 +22,7 @@ import javax.mail.Message
 class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener{
 
     var emailController: EmailController = EmailController()
+    lateinit var listEmails: Array<Message>
     lateinit var mailbox : Mailboxes
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +47,17 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
 
     private fun loadEmailsAndRV(){
         //To load emails
-        emailController.retrieveAllEmails(mailbox){listEmails ->
+        emailController.retrieveAllEmails(mailbox){emails ->
             AppExecutors.MainThreadExecutor().execute {
+                listEmails = emails
                 callAdapterRV(listEmails)
             }
         }
+    }
+
+    private fun callAdapterRV(listEmails: Array<Message>) {
+        recycler_view.adapter = EmailsListAdapter(this, listEmails)
+        recycler_view.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -86,11 +93,6 @@ class AllEmailsController : AppCompatActivity(), NavigationView.OnNavigationItem
         }
 
         return true
-    }
-
-    private fun callAdapterRV(listEmails: Array<Message>) {
-        recycler_view.adapter = EmailsListAdapter(this, listEmails)
-        recycler_view.layoutManager = LinearLayoutManager(this)
     }
 
     fun iniRefreshListener() {
